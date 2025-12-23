@@ -53,6 +53,7 @@ type LogConfig struct {
 
 // S3Config S3配置
 type S3Config struct {
+	Enabled         bool   `mapstructure:"enabled"`
 	AccessKeyID     string `mapstructure:"access_key_id"`
 	SecretAccessKey string `mapstructure:"secret_access_key"`
 	Region          string `mapstructure:"region"`

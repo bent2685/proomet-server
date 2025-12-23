@@ -32,6 +32,7 @@ database:
   timezone: "Asia/Shanghai" # 时区
 
 s3:
+  enabled: false
   access_key_id: "rustfsadmin"
   secret_access_key: "rustfsadmin"
   region: "none"

@@ -6,7 +6,6 @@ import (
 	"os"
 	"proomet/config"
 	_ "proomet/docs"
-	"proomet/internal/application/services/rbac"
 	"proomet/internal/infra/database"
 	"proomet/internal/infra/ofs"
 	"proomet/internal/interfaces/routes"
@@ -58,22 +57,8 @@ func main() {
 		utils.Log.Info("执行数据库迁移...")
 		database.AutoMigrate()
 
-		if err := rbac.InitRBAC(); err != nil {
-			utils.Log.Fatalf("RBAC服务初始化失败: %v", err)
-		}
-
-		rbac.AddPolicy("admin", "/users/*", "*")
-		rbac.AddPolicy("user", "/users/:id", "GET")
-		rbac.AddPolicy("super_admin", "*", "*")
-		rbac.AddRoleForUser("1", "admin")
-		rbac.SavePolicy()
-
 		utils.Log.Info("数据库迁移完成")
 		return
-	}
-
-	if err := rbac.InitRBAC(); err != nil {
-		utils.Log.Fatalf("RBAC服务初始化失败: %v", err)
 	}
 
 	r := gin.New()
@@ -82,21 +67,14 @@ func main() {
 
 	routerManager := routes.NewRouterManager()
 	routerManager.RegisterRouter(routes.NewTestRouter())
-	routerManager.RegisterRouter(routes.NewUserRouter())
-	routerManager.RegisterRouter(routes.NewRBACRouter())
-	routerManager.RegisterRouter(routes.NewDepartmentRouter())
-	routerManager.RegisterRouter(routes.NewProtectedRouter())
 	routerManager.SetupRoutes(r)
 
 	addr := fmt.Sprintf("%s:%s", config.AppConfig.Server.Host, config.AppConfig.Server.Port)
+	utils.Log.Success("🎉[proomet-server] 服务启动完成")
+
 	// 启动服务器
 	if err := r.Run(addr); err != nil {
 		log.Fatal("服务器启动失败:", err)
 	}
 
-	utils.Log.WithFields(map[string]any{
-		"addr": addr,
-	}).Info("服务器配置信息")
-
-	utils.Log.Success("服务启动完成")
 }

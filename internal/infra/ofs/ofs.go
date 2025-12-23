@@ -25,6 +25,10 @@ func InitOfs() {
 	if config.AppConfig == nil {
 		utils.Log.Fatal("配置未初始化")
 	}
+	if !config.AppConfig.S3.Enabled {
+		utils.Log.Info("S3未启用")
+		return
+	}
 	accessKeyID := config.AppConfig.S3.AccessKeyID
 	secretAccessKey := config.AppConfig.S3.SecretAccessKey
 	region := config.AppConfig.S3.Region
