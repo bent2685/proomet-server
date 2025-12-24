@@ -2,6 +2,7 @@ package database
 
 import (
 	"log"
+	"proomet/internal/domain/models"
 
 	gormadapter "github.com/casbin/gorm-adapter/v3"
 )
@@ -14,7 +15,7 @@ func AutoMigrate() {
 
 	// 添加需要迁移的模型
 	// 注意：Casbin 使用自己的表来管理用户-角色关系和角色-权限关系
-	err := DB.AutoMigrate()
+	err := DB.AutoMigrate(&models.User{})
 
 	if err != nil {
 		log.Fatalf("数据库迁移失败: %v", err)

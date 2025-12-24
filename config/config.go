@@ -62,7 +62,8 @@ type S3Config struct {
 
 // JWTConfig JWT配置
 type JWTConfig struct {
-	Secret string `mapstructure:"secret"`
+	Expired int64  `mapstructure:"expired"`
+	Secret  string `mapstructure:"secret"`
 }
 
 // Init 初始化配置
@@ -174,12 +175,4 @@ func bindEnvs() {
 	viper.BindEnv("s3.secret_access_key", "STARTER_S3_SECRET_ACCESS_KEY")
 	viper.BindEnv("s3.region", "STARTER_S3_REGION")
 	viper.BindEnv("s3.endpoint", "STARTER_S3_ENDPOINT")
-}
-
-// GetJWTSecret 获取JWT密钥
-func GetJWTSecret() string {
-	if AppConfig != nil {
-		return AppConfig.JWT.Secret
-	}
-	return "proomet-secret-key"
 }

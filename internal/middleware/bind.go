@@ -18,7 +18,7 @@ func BindRequest(req interface{}) gin.HandlerFunc {
 
 		// 绑定请求体
 		if err := c.ShouldBindJSON(reqInterface); err != nil {
-			res.ErrInvalidParam.ThrowWithMessage(c, validators.GetValidationError(err))
+			res.ErrInvalidParam.ThrowMsg(c, validators.GetValidationError(err))
 			c.Abort()
 			return
 		}
@@ -53,7 +53,7 @@ func BindAndProcess(req interface{}, processor func(*gin.Context, interface{}) i
 
 		// 绑定请求体
 		if err := c.ShouldBindJSON(reqInterface); err != nil {
-			res.ErrInvalidParam.ThrowWithMessage(c, validators.GetValidationError(err))
+			res.ErrInvalidParam.ThrowMsg(c, validators.GetValidationError(err))
 			return
 		}
 
@@ -74,7 +74,7 @@ func BindQuery(req interface{}) gin.HandlerFunc {
 
 		// 绑定查询参数
 		if err := c.ShouldBindQuery(reqInterface); err != nil {
-			res.ErrInvalidParam.ThrowWithMessage(c, validators.GetValidationError(err))
+			res.ErrInvalidParam.ThrowMsg(c, validators.GetValidationError(err))
 			c.Abort()
 			return
 		}
@@ -94,7 +94,7 @@ func BindURI(req interface{}) gin.HandlerFunc {
 
 		// 绑定URI参数
 		if err := c.ShouldBindUri(reqInterface); err != nil {
-			res.ErrInvalidParam.ThrowWithMessage(c, validators.GetValidationError(err))
+			res.ErrInvalidParam.ThrowMsg(c, validators.GetValidationError(err))
 			c.Abort()
 			return
 		}

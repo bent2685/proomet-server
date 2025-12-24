@@ -4,8 +4,9 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
-	"proomet/pkg/utils/res"
 	"net/http"
+	"proomet/pkg/utils"
+	"proomet/pkg/utils/res"
 	"runtime/debug"
 
 	"github.com/gin-gonic/gin"
@@ -19,37 +20,45 @@ func RecoveryMiddleware() gin.HandlerFunc {
 		TimestampFormat: "2006-01-02 15:04:05",
 	})
 
-	return gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
-		// 处理业务异常
-		if businessErr, ok := recovered.(*res.BusinessError); ok {
-			logger.WithFields(logrus.Fields{
-				"method":     c.Request.Method,
-				"path":       c.Request.URL.Path,
-				"client_ip":  c.ClientIP(),
-				"error_code": businessErr.Code,
-				"error_msg":  businessErr.Message,
-			}).Warn("Business Error")
+	return func(c *gin.Context) {
+		defer func() {
+			if err := recover(); err != nil {
+				// 处理业务异常
+				if businessErr, ok := err.(*res.BusinessError); ok {
+					utils.Log.Error(logrus.Fields{
+						"type":       "API_RESPONSE",
+						"method":     c.Request.Method,
+						"path":       c.Request.URL.Path,
+						"client_ip":  c.ClientIP(),
+						"error_code": businessErr.Code,
+						"error_msg":  businessErr.Message,
+					})
 
-			res.Error(c, businessErr.Code, businessErr.Message)
-			return
-		}
+					c.JSON(http.StatusOK, businessErr)
+					c.Abort()
+					return
+				}
 
-		// 处理系统异常
-		err := fmt.Sprintf("%v", recovered)
-		stack := string(debug.Stack())
+				// 处理系统异常
+				stack := string(debug.Stack())
+				utils.Log.Error(logrus.Fields{
+					"type":      "SYSTEM_PANIC",
+					"method":    c.Request.Method,
+					"path":      c.Request.URL.Path,
+					"client_ip": c.ClientIP(),
+					"error":     fmt.Sprintf("%v", err),
+					"stack":     stack,
+				})
 
-		logger.WithFields(logrus.Fields{
-			"method":    c.Request.Method,
-			"path":      c.Request.URL.Path,
-			"client_ip": c.ClientIP(),
-			"error":     err,
-			"stack":     stack,
-		}).Error("System Error")
-
-		// 返回通用系统错误
-		res.ErrorWithHttpStatus(c, http.StatusInternalServerError,
-			res.ErrInternalServer.Code, "服务器内部错误")
-	})
+				c.JSON(http.StatusOK, res.Response{
+					Code:    res.ErrInternalServer.Code,
+					Message: res.ErrInternalServer.Message,
+				})
+				c.Abort()
+			}
+		}()
+		c.Next()
+	}
 }
 
 // CORSMiddleware 跨域中间件

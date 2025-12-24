@@ -5,6 +5,10 @@ swag:
 	@echo "Generating Swagger documentation..."
 	swag init --parseDependency --parseInternal
 
+migrate:
+	@echo "Migrating database..."
+	go run main.go migrate
+
 # Build for multiple platforms and architectures
 build:
 	@echo "Building for multiple platforms..."

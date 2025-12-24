@@ -23,5 +23,5 @@ func (tr *TestRouter) RegisterRoutes(router *gin.RouterGroup) {
 
 // Health 健康检查
 func (tr *TestRouter) Health(c *gin.Context) {
-	res.SuccessWithMessage(c, "PONG", true)
+	res.SuccessMsg(c, "PONG", true)
 }

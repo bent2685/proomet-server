@@ -15,7 +15,7 @@ type Handler func(c *gin.Context) error
 func Handle(h Handler) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if err := h(c); err != nil {
-			res.ErrInternalServer.ThrowWithMessage(c, err.Error())
+			res.ErrInternalServer.ThrowMsg(c, err.Error())
 		}
 	}
 }
@@ -45,18 +45,23 @@ func Success(c *gin.Context, data any) {
 
 // SuccessWithMessage 返回带消息的成功响应
 func SuccessWithMessage(c *gin.Context, message string, data any) {
-	res.SuccessWithMessage(c, message, data)
+	res.SuccessMsg(c, message, data)
 }
 
-// Error 返回错误响应
+// Error 返回错误响应并 panic
 func Error(c *gin.Context, err error) {
-	res.ErrInternalServer.ThrowWithMessage(c, err.Error())
+	// 如果是 BusinessError，直接 panic 以保留原始错误码
+	if businessErr, ok := err.(*res.BusinessError); ok {
+		panic(businessErr)
+	}
+	// 其他错误统一使用内部服务器错误
+	res.ErrInternalServer.ThrowMsg(c, err.Error())
 }
 
 // Bind 绑定并验证请求
 func Bind(c *gin.Context, req any) error {
 	if err := c.ShouldBindJSON(req); err != nil {
-		res.ErrInvalidParam.ThrowWithMessage(c, validators.GetValidationError(err))
+		res.ErrInvalidParam.ThrowMsg(c, validators.GetValidationError(err))
 		return err
 	}
 	return nil

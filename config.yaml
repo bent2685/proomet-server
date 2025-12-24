@@ -40,4 +40,5 @@ s3:
 
 # JWT配置
 jwt:
-  secret: "proomet-secret-key" # JWT密钥，请在生产环境中使用强密码
+  expired: 604800
+  secret: "Y3KTi+HQ?3D,^FiU[TnpGov|j[PA]^,q<KA]Q}QyZ*Z"

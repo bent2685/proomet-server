@@ -31,7 +31,7 @@ func HandleValidationErrors(c *gin.Context, err error) {
 	}
 
 	// 处理其他绑定错误
-	Error(c, 400001, "参数错误: "+err.Error())
+	ErrorWithDetails(c, 400001, "参数错误: "+err.Error(), nil)
 }
 
 // ErrorWithDetails 带详细信息的错误响应

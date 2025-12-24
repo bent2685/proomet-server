@@ -6,6 +6,7 @@ import (
 	"os"
 	"proomet/config"
 	_ "proomet/docs"
+	"proomet/internal/infra/auth"
 	"proomet/internal/infra/database"
 	"proomet/internal/infra/ofs"
 	"proomet/internal/interfaces/routes"
@@ -52,7 +53,6 @@ func main() {
 	defer database.Close()
 	database.InitDatabase()
 	// 初始化s3
-	ofs.InitOfs()
 	if runMigration {
 		utils.Log.Info("执行数据库迁移...")
 		database.AutoMigrate()
@@ -60,6 +60,8 @@ func main() {
 		utils.Log.Info("数据库迁移完成")
 		return
 	}
+	ofs.InitOfs()
+	auth.InitCasbin(database.GetDB())
 
 	r := gin.New()
 	r.Use(middleware.RecoveryMiddleware())
@@ -67,6 +69,7 @@ func main() {
 
 	routerManager := routes.NewRouterManager()
 	routerManager.RegisterRouter(routes.NewTestRouter())
+	routerManager.RegisterRouter(routes.NewAuthRouter())
 	routerManager.SetupRoutes(r)
 
 	addr := fmt.Sprintf("%s:%s", config.AppConfig.Server.Host, config.AppConfig.Server.Port)
