@@ -1,0 +1,9 @@
+[build]
+  cmd = "go build -gcflags='all=-N -l' -o ./tmp/main ."
+  full_bin = "dlv exec --accept-multiclient --headless=true --listen=:2345 --api-version=2 --continue ./tmp/main"
+  
+  # 监听后缀，包含你的 Gin 模板和配置文件
+  include_ext = ["go", "tpl", "tmpl", "html", "yaml", "toml", "json"]
+  
+  # 排除编译产物和 Git 目录
+  exclude_dir = ["dist", "tmp", "vendor", ".git"]

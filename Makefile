@@ -1,4 +1,4 @@
-.PHONY: swag build clean build-linux build-windows build-darwin
+.PHONY: swag build clean build-linux build-windows build-darwin dev
 
 # Generate Swagger documentation
 swag:

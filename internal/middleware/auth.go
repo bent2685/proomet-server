@@ -16,7 +16,7 @@ func Authenticate() gin.HandlerFunc {
 
 		// 1. 无 Header，注入 Guest 身份
 		if authHeader == "" {
-			c.Set("currentUser", &models.JwtUser{Role: "guest", Username: "guest"})
+			c.Set("currentUser", models.JwtUser{Role: "guest", Username: "guest"})
 			c.Next()
 			return
 		}
@@ -51,7 +51,7 @@ func Authorize() gin.HandlerFunc {
 		if !exists {
 			res.ErrUnauthorized.Throw(c)
 		}
-		user := userRaw.(*models.JwtUser)
+		user := userRaw.(models.JwtUser)
 		// 获取请求的资源(Object)和动作(Action)
 		obj := c.Request.URL.Path
 		act := c.Request.Method

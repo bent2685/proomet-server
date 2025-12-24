@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"proomet/internal/middleware"
 	"proomet/pkg/utils/res"
 
 	"github.com/gin-gonic/gin"
@@ -17,11 +18,20 @@ func NewTestRouter() *TestRouter {
 func (tr *TestRouter) RegisterRoutes(router *gin.RouterGroup) {
 	testGroup := router.Group("/test")
 	{
-		testGroup.GET("/health", tr.Health)
+		testGroup.GET("/health",
+			middleware.Authenticate(),
+			middleware.Authorize(),
+			tr.Health)
 	}
 }
 
-// Health 健康检查
+// PING godoc
+// @Summary 测试路由
+// @Tags 测试
+// @Accept json
+// @Produce json
+// @Success 200 {object} res.Response{data=bool} "成功"
+// @Router /test/health [get]
 func (tr *TestRouter) Health(c *gin.Context) {
 	res.SuccessMsg(c, "PONG", true)
 }

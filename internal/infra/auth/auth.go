@@ -18,7 +18,7 @@ func InitCasbin(db *gorm.DB) {
 	}
 
 	// 2. 加载模型配置
-	Enforcer, err := casbin.NewEnforcer("config/rbac_model.conf", adapter)
+	Enforcer, err = casbin.NewEnforcer("config/rbac_model.conf", adapter)
 	if err != nil {
 		utils.Log.Fatalf("Casbin 初始化失败 %s", err)
 	}
